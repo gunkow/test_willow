@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from collections import OrderedDict
+
 from sqlalchemy import ForeignKeyConstraint
 
 db = SQLAlchemy()
@@ -47,3 +48,12 @@ class Wikipage(db.Model, asDictable):
                                    #backref=db.backref('wiki', lazy='dynamic')
                                    )
 
+    def add_new_page(self, json):
+        try:
+            # page = Page(**json)
+            page = Page(title=json['title'], text=json['text'], wikipage=self)
+            self.current_page = page
+            db.session.add(page)
+            db.session.commit()
+        except Exception as e:
+            raise e

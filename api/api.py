@@ -1,5 +1,6 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from .models import db, Wikipage, Page
+import json
 
 
 main = Blueprint('main', __name__)
@@ -26,6 +27,15 @@ def current(wiki_id):
     wiki = Wikipage.query.get(wiki_id)
     current_page = wiki.current_page
     return jsonify(current_page.asdict())
+
+# EDIT
+
+@main.route('/<int:wiki_id>/', methods=['POST'])
+def add_new(wiki_id):
+    wiki = Wikipage.query.get(wiki_id)
+    data = request.values
+    wiki.add_new_page(data)
+    return jsonify(status=200)
 
 
 

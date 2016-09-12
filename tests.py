@@ -77,3 +77,16 @@ def test_current_response(client):
       "wikipage_id": 1
     }
 
+def test_add_new(client):
+    res = client.post(url_for('main.add_new', wiki_id=2), data={'title': "New", 'text': "yay"}, headers={'mimetype': 'application/json'})
+    assert res.json == {
+      "status": 200
+    }
+    res = client.get(url_for('main.current', wiki_id=2))
+    assert res.json == {
+      "id": 4,
+      "text": "yay",
+      "title": "New",
+      "wikipage_id": 2
+    }
+
