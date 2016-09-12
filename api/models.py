@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from collections import OrderedDict
-
+from sqlalchemy import ForeignKeyConstraint
 
 db = SQLAlchemy()
 
@@ -13,18 +13,37 @@ class asDictable(object):
         return result
 
 
-class Wikipage(db.Model, asDictable):
-    id = db.Column(db.Integer, primary_key=True)
-    current_page_id = db.Column(db.Integer, db.ForeignKey('page.id'))
-    current_page = db.relationship('Page', foreign_keys=current_page_id,
-                           backref=db.backref('wiki', lazy='dynamic'))
 
 class Page(db.Model, asDictable):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(55))
     text = db.Column(db.Text)
     wikipage_id = db.Column(db.Integer, db.ForeignKey('wikipage.id'))
-    wikipage = db.relationship(Wikipage, foreign_keys=wikipage_id,
-                           backref=db.backref('pages', lazy='dynamic'),
-                               post_update=True)
+    __table_args__ = (
+        db.UniqueConstraint("id", "wikipage_id"),
+    )
+    wikipage = db.relationship('Wikipage',
+                            foreign_keys=wikipage_id,
+                               )
+
+class Wikipage(db.Model, asDictable):
+    id = db.Column(db.Integer, primary_key=True, autoincrement='ignore_fk', )
+    current_page_id = db.Column(db.Integer)
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["id", "current_page_id"],
+            ["page.wikipage_id", "page.id"],
+            name="fk_current_page"
+        ),
+    )
+
+    pages = db.relationship(Page, primaryjoin=
+                                    id==Page.wikipage_id,
+                            foreign_keys=Page.wikipage_id)
+    current_page = db.relationship(Page,
+                                   primaryjoin=
+                                        current_page_id == Page.id,
+                                   foreign_keys=current_page_id, post_update=True,
+                                   #backref=db.backref('wiki', lazy='dynamic')
+                                   )
 

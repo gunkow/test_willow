@@ -17,12 +17,12 @@ def versions(wiki_id):
     return jsonify(map(lambda page: page.asdict(), pages))
 
 @main.route('/<int:page_id>')
-def versions(page_id):
+def distinct(page_id):
     page = Page.query.get(page_id)
     return jsonify(page.asdict())
 
 @main.route('/<int:wiki_id>/current')
-def versions(wiki_id):
+def current(wiki_id):
     wiki = Wikipage.query.get(wiki_id)
     current_page = wiki.current_page
     return jsonify(current_page.asdict())
