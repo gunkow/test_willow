@@ -1,6 +1,7 @@
 import pytest
 import pytest_flask
 from flask import url_for
+import json
 
 from api import create_app
 from api.models import db, Page, Wikipage
@@ -27,10 +28,52 @@ def app():
     yield app
 
 
-def test_my_json_response(client):
+def test_all_response(client):
     res = client.get(url_for('main.all'))
-    assert res.json == 42
+    assert res.json == ([
+      {
+        "current_page_id": 1,
+        "id": 1
+      },
+      {
+        "current_page_id": 2,
+        "id": 2
+      }
+    ])
 
-def test_my_2_response(client):
-    res = client.get(url_for('main.versions'))
-    assert res.json == 42
+def test_versions_response(client):
+    res = client.get(url_for('main.versions', wiki_id=1))
+    assert res.json == [
+        {
+            "id": 1,
+            "text": "ss",
+            "title": "first title2",
+            "wikipage_id": 1
+        },
+        {
+            "id": 3,
+            "text": "s",
+            "title": "first title",
+            "wikipage_id": 1
+        }
+    ]
+
+def test_distinct_response(client):
+    res = client.get(url_for('main.distinct', page_id=1))
+    assert res.json == {
+      "id": 1,
+      "text": "ss",
+      "title": "first title2",
+      "wikipage_id": 1
+    }
+
+
+def test_current_response(client):
+    res = client.get(url_for('main.current', wiki_id=1))
+    assert res.json == {
+      "id": 1,
+      "text": "ss",
+      "title": "first title2",
+      "wikipage_id": 1
+    }
+
