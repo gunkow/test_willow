@@ -90,3 +90,17 @@ def test_add_new(client):
       "wikipage_id": 2
     }
 
+
+def test_set_current(client):
+    res = client.post(url_for('main.set_current', wiki_id=2), data={'page_id': 2}, headers={'mimetype': 'application/json'})
+    assert res.json == {
+      "status": 200
+    }
+    res = client.get(url_for('main.current', wiki_id=2))
+    assert res.json == {
+  "id": 2,
+  "text": "z",
+  "title": "first title of second wiki",
+  "wikipage_id": 2
+}
+

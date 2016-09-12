@@ -48,12 +48,10 @@ class Wikipage(db.Model, asDictable):
                                    #backref=db.backref('wiki', lazy='dynamic')
                                    )
 
-    def add_new_page(self, json):
+    def set_new_page(self, page):
         try:
-            # page = Page(**json)
-            page = Page(title=json['title'], text=json['text'], wikipage=self)
             self.current_page = page
             db.session.add(page)
             db.session.commit()
-        except Exception as e:
+        except Exception as e: # make more specific
             raise e

@@ -30,11 +30,23 @@ def current(wiki_id):
 
 # EDIT
 
-@main.route('/<int:wiki_id>/', methods=['POST'])
+@main.route('/add/<int:wiki_id>/', methods=['POST'])
 def add_new(wiki_id):
     wiki = Wikipage.query.get(wiki_id)
+    # todo: validate input
     data = request.values
-    wiki.add_new_page(data)
+    # page = Page(**data)
+    page = Page(title=data['title'], text=data['text'], wikipage=wiki)
+    wiki.set_new_page(page)
+    return jsonify(status=200)
+
+
+@main.route('/set/<int:wiki_id>/', methods=['POST'])
+def set_current(wiki_id):
+    wiki = Wikipage.query.get(wiki_id)
+    data = request.values
+    page = Page.query.get(data['page_id'])
+    wiki.set_new_page(page)
     return jsonify(status=200)
 
 
